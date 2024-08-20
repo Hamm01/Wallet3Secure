@@ -1,14 +1,12 @@
-import { ModeToggle } from '@/components/mode-toggle'
-import { Button } from "@/components/ui/button"
+
 import './App.css'
 
-
+import Navbar from './components/Navbar'
 
 function App() {
-  return <div className='w-full bg-red-50 flex justify-center items-center'>
+  return <div className='max-w-7xl mx-auto flex flex-col gap-4 p-4'>
+    <Navbar />
 
-    <ModeToggle />
-    <Button>Clickme</Button>
 
   </div>
 }
