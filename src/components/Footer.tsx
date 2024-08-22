@@ -1,4 +1,4 @@
-
+import { Dribbble, Instagram, Twitch, Twitter } from 'lucide-react';
 
 export default function Footer() {
     return (
@@ -7,6 +7,12 @@ export default function Footer() {
                 <p className="text-primary text-xl tracking-tight">Developed By &nbsp;
                     <a href="https://github.com/hamm01">Himanish </a>
                 </p>
+                <div className="icons flex gap-2">
+                    <a href="https://dribble.com"><Dribbble /> </a >
+                    <a href="https://instagram.com"><Instagram /> </a >
+                    <a href="https://twitch.com"><Twitch /> </a >
+                    <a href="https://twitter.com"><Twitter /> </a >
+                </div>
             </div>
         </section>
     )
