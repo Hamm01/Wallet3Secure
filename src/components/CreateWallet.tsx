@@ -1,26 +1,51 @@
-import { Button } from "@/components/ui/button"
-import { ChevronLast } from 'lucide-react'
+// import { Button } from "@/components/ui/button"
+// import { ChevronLast } from 'lucide-react'
 import { WalletType } from '../lib/types'
 import { useState } from "react"
+import WalletHome from "./WalletHome"
+import RecoveryPhrase from './RecoveryPhrase'
+import { createMemonicWallet, generateMnemonicWords } from '../lib/walletFunctions'
 
 export default function CreateWallet() {
     const [wallet, setWallet] = useState<WalletType[]>([])
+    const [pathTypes, setPathtypes] = useState<string[]>([])
+    const [mnemonicWords, setMnemonicWords] = useState<string[]>(
+        Array(12).fill(" ")
+    );
+    const [mnemonicInput, setMnemonicInput] = useState<string>("")
+
+    // Wallet Genearator using memonic
+    const walletGenerate = async () => {
+        // Generating or validating the 12 key phrase
+        const mnemonicArray = await generateMnemonicWords(mnemonicInput)
+
+        if (!mnemonicArray) {
+            console.error('Memonics Error during validation or generating')
+            return;
+        } else {
+            setMnemonicWords(mnemonicArray)
+            const mnemonic = mnemonicArray.join(" ")
+            const stringCase = pathTypes?.[0] || " "
+            const AccountIndex = wallet.length
+            const Wallet = createMemonicWallet({
+                mnemonic, pathTypes: stringCase, index: AccountIndex
+            })
+            if (Wallet) {
+                const updatedWallets = [...wallet, Wallet]
+                setWallet(updatedWallets)
+            }
+        }
+    }
+
 
     return (
         <div className='flex flex-col gap-4'>
-            {wallet.length == 0 && <div className='flex flex-col gap-4'>
-                <div className='flex flex-col gap-2 my-5'>
-                    <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">Power Your Crypto Journey: Ethereum & Solana, One Wallet</h1>
-                    <p className="scroll-m-20 pb-2 pt-2 text-2xl font-semibold tracking-tight first:mt-0"> Select Blockchain and Get Started</p>
-                    <div className='flex gap-2 mt-2'>
-                        <Button className='p-5' >Ethereum</Button>
-                        <Button className='p-5' >
-                            Solana
-                            <ChevronLast size={20} />
-                        </Button>
-                    </div>
-                </div>
-            </div>}
+            {wallet.length == 0 && (<div className="flex flex-col gap-4">
+                {pathTypes.length === 0 && (<WalletHome setPathtypes={setPathtypes} />)}
+                {pathTypes.length !== 0 && (<RecoveryPhrase walletGenerate={walletGenerate} mnemonicInput={mnemonicInput} setMnemonicInput={setMnemonicInput} />)}
+
+            </div>)}
+
         </div>
     )
 }
