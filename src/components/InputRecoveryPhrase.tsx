@@ -24,10 +24,7 @@ const InputRecoveryPhrase: React.FC<Props> = ({ walletGenerate, mnemonicInput, s
                 <TooltipProvider>
                     <Tooltip>
                         <TooltipTrigger asChild>
-                            <Input type="mnemonics" className='p-5 focus:border-black focus:ring-0 focus:outline-none focus:border-1 ' placeholder="Enter Your Secret Phrase" value={mnemonicInput} onChange={(e) => {
-
-                                return setMnemonicInput(e.target.value)
-                            }} />
+                            <Input type="mnemonics" className='p-5 focus:border-black focus:ring-0 focus:outline-none focus:border-1 ' placeholder="Enter Your Secret Phrase" value={mnemonicInput} onChange={(e) => setMnemonicInput(e.target.value)} />
                         </TooltipTrigger>
                         <TooltipContent side='bottom' sideOffset={20}>
                             <p className='text-xl'>In case no secret phrase : Leave it blank and press Generate Wallet </p>

@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { ChevronDown, ChevronUp, Copy } from 'lucide-react';
 import { Button } from "@/components/ui/button"
+import { copyToClipboard } from '../lib/utils'
 
-import { toast } from 'sonner';
 
 interface RecoveryPhraseType {
     mnemonicWords: string[]
@@ -11,10 +11,7 @@ export const DisplayRecoveryPhrase: React.FC<RecoveryPhraseType> = ({ mnemonicWo
     const [showMemonic, setShowMemonic] = useState(false)
 
 
-    const copyToClipboard = (content: string) => {
-        navigator.clipboard.writeText(content)
-        toast('Copied to clipboard!')
-    }
+
     return (
         <div className='flex flex-col gap-4'>
             <div className='flex flex-col gap-4 my-10 border p-6 rounded-md'>
@@ -37,3 +34,4 @@ export const DisplayRecoveryPhrase: React.FC<RecoveryPhraseType> = ({ mnemonicWo
         </div>
     )
 }
+
