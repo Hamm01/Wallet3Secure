@@ -8,13 +8,15 @@ import { Keypair } from '@solana/web3.js'
 
 const generateMnemonicWords = async (input: string) => {
   let mnemonicWords = input.trim()
-  if (mnemonicWords && !validateMnemonic(mnemonicWords)) {
-    console.error('Phrase inputs are wrong to restore the wallet')
-    return
+  if (mnemonicWords.length !== 0) {
+    if (!validateMnemonic(mnemonicWords)) {
+      console.error('Phrase inputs are wrong to restore the wallet')
+      return
+    } else {
+      return mnemonicWords.split(' ')
+    }
   } else {
-    // Generating the menemonics
     mnemonicWords = await generateMnemonic()
-    console.log('mnemonicWords', mnemonicWords)
   }
 
   return mnemonicWords.split(' ')
