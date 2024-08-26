@@ -1,5 +1,5 @@
 export interface WalletType {
-  publicKey: String
+  publicKey: string
   privateKey: string
   mnemonic: string
   path: string
