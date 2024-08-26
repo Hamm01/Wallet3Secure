@@ -14,9 +14,9 @@ export const DisplayRecoveryPhrase: React.FC<RecoveryPhraseType> = ({ mnemonicWo
 
     return (
         <div className='flex flex-col gap-4'>
-            <div className='flex flex-col gap-4 my-10 border p-6 rounded-md'>
+            <div className='flex flex-col gap-4 my-10 border border-primary/50 p-6 rounded-md'>
                 <div className='content flex justify-between cursor-pointer' onClick={() => setShowMemonic(!showMemonic)}>
-                    <h1 className="scroll-m-20 text-2xl font-semibold" >Secret Phrases</h1>
+                    <h1 className="righteous-regular scroll-m-20 text-2xl font-semibold" >Secret Phrases</h1>
                     <Button size="icon" variant="ghost" onClick={() => setShowMemonic(!showMemonic)}>{showMemonic ? (<ChevronUp size={20} strokeWidth={1.5} />) : (<ChevronDown size={20} strokeWidth={1.5} />)}</Button>
                 </div>
                 {showMemonic && mnemonicWords.length > 0 && (
