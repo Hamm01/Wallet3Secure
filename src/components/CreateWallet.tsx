@@ -1,12 +1,13 @@
 import { WalletType } from '../lib/types'
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import WalletHome from "./WalletHome"
 import InputRecoveryPhrase from './InputRecoveryPhrase'
-import { createMemonicWallet, generateMnemonicWords } from '../lib/walletFunctions'
+import { createMemonicWallet, fetchWallet, generateMnemonicWords, saveWalletKeys } from '../lib/walletFunctions'
 import { DisplayRecoveryPhrase } from './displayRecoveryPhrase'
 import { Button } from './ui/button'
 import { copyToClipboard } from '../lib/utils'
 import { EyeOff, Eye, Trash } from 'lucide-react'
+import { toast } from 'sonner'
 
 
 export default function CreateWallet() {
@@ -17,6 +18,20 @@ export default function CreateWallet() {
     );
     const [visiblePrivateKeys, setVisiblePrivateKeys] = useState<boolean[]>([]);
     const [mnemonicInput, setMnemonicInput] = useState<string>("")
+
+
+    useEffect(() => {
+        const storedkeys = fetchWallet()
+        if (storedkeys) {
+            const { wallet, mnemonics, pathTypes } = storedkeys
+            setPathtypes(pathTypes)
+            setMnemonicWords(mnemonics)
+            setWallets(wallet)
+            setVisiblePrivateKeys(wallet.map(() => false))
+            toast.success("Wallet Fetched properly")
+        }
+
+    }, [])
 
 
     const toggleVisibility = (index: number) => {
@@ -42,6 +57,8 @@ export default function CreateWallet() {
                 const updatedWallets = [...wallets, Wallet]
                 setWallets(updatedWallets)
                 setVisiblePrivateKeys([...visiblePrivateKeys, false])
+                saveWalletKeys({ wallet: updatedWallets, mnemonics: mnemonicArray, pathTypes })
+                toast.success("Wallet generated successfully")
             }
         }
     }
