@@ -97,7 +97,26 @@ export default function CreateWallet() {
         setPathtypes([])
         setMnemonicWords([])
         setVisiblePrivateKeys([])
-        toast.success("Cleared all wallets succesfuly!!")
+        toast.success("Cleared all wallets successfully !!")
+    }
+
+    const deleteWallets = (index: number) => {
+        const updatedWallets = wallets.filter((_, i) => i !== index)
+        let updatedPathTypes
+        if (updatedWallets?.length < 1) {
+            updatedPathTypes = pathTypes.filter((
+                _, i) => i !== index)
+            setPathtypes(updatedPathTypes)
+            setWallets(updatedWallets)
+            saveWalletKeys({ wallets: updatedWallets, mnemonics: mnemonicWords, pathTypes: updatedPathTypes })
+        } else {
+            setWallets(updatedWallets)
+            saveWalletKeys({ wallets: updatedWallets, mnemonics: mnemonicWords, pathTypes })
+
+        }
+
+        setVisiblePrivateKeys(visiblePrivateKeys.filter((_, i) => i !== index));
+        toast.success("Deleted Wallet successfully !!")
     }
 
 
@@ -140,7 +159,24 @@ export default function CreateWallet() {
                         <div className="flex flex-col border border-primary/50 rounded-md" key={index}>
                             <div className="flex justify-between px-8 py-6">
                                 <h2 className='righteous-regular scroll-m-20 lg:text-3xl font-semibold'>Wallet {index + 1}</h2>
-                                <Button variant="ghost" size="sm"><Trash size={18} color="#ff0000" />  </Button>
+                                <AlertDialog>
+                                    <AlertDialogTrigger asChild>
+                                        <Button variant="ghost" size="sm"><Trash size={18} color="#ff0000" />  </Button>
+                                    </AlertDialogTrigger>
+                                    <AlertDialogContent>
+                                        <AlertDialogHeader>
+                                            <AlertDialogTitle>Are you want to delete this wallet</AlertDialogTitle>
+                                            <AlertDialogDescription>
+                                                This will delete the wallet from the screen
+                                            </AlertDialogDescription>
+                                        </AlertDialogHeader>
+                                        <AlertDialogFooter>
+                                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                            <AlertDialogAction onClick={() => deleteWallets(index)}>Delete Wallet</AlertDialogAction>
+                                        </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                </AlertDialog>
+
                             </div>
                             <div className='flex flex-col bg-secondary/50 px-8 py-6  cursor-pointer'>
                                 <div className="publickey flex flex-col w-full gap-2" onClick={() => copyToClipboard(wallet?.publicKey)}>
