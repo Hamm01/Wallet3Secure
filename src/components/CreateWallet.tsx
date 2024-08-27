@@ -2,7 +2,7 @@ import { WalletType } from '../lib/types'
 import { useState, useEffect } from "react"
 import WalletHome from "./WalletHome"
 import InputRecoveryPhrase from './InputRecoveryPhrase'
-import { createMemonicWallet, fetchWallet, generateMnemonicWords, saveWalletKeys } from '../lib/walletFunctions'
+import { clearWalletsKeys, createMemonicWallet, fetchWallet, generateMnemonicWords, saveWalletKeys } from '../lib/walletFunctions'
 import { DisplayRecoveryPhrase } from './displayRecoveryPhrase'
 import { Button } from './ui/button'
 import { copyToClipboard } from '../lib/utils'
@@ -88,6 +88,17 @@ export default function CreateWallet() {
         }
 
     }
+    const clearWallets = () => {
+        if (!clearWalletsKeys()) {
+            console.error("Error in deletion of wallet keys")
+            return
+        }
+        setWallets([])
+        setPathtypes([])
+        setMnemonicWords([])
+        setVisiblePrivateKeys([])
+        toast.success("Cleared all wallets succesfuly!!")
+    }
 
 
     return (
@@ -118,11 +129,10 @@ export default function CreateWallet() {
                                 </AlertDialogHeader>
                                 <AlertDialogFooter>
                                     <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                    <AlertDialogAction >Continue</AlertDialogAction>
+                                    <AlertDialogAction onClick={clearWallets}>Delete Wallets</AlertDialogAction>
                                 </AlertDialogFooter>
                             </AlertDialogContent>
                         </AlertDialog>
-                        <Button variant="destructive" size="sm">Clear Wallets</Button>
                     </div>
                 </div>
                 <div className="grid grid-col-1 col-span-1 gap-4">

@@ -96,9 +96,21 @@ const fetchWallet = (): localStorageParams | null => {
   }
 }
 
+const clearWalletsKeys = () => {
+  try {
+    localStorage.removeItem('wallet')
+    localStorage.removeItem('mnemonics')
+    localStorage.removeItem('pathTypes')
+    return true
+  } catch (e) {
+    throw Error('Deleteion error')
+  }
+}
+
 export {
   generateMnemonicWords,
   createMemonicWallet,
   saveWalletKeys,
-  fetchWallet
+  fetchWallet,
+  clearWalletsKeys
 }
