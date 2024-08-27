@@ -66,17 +66,17 @@ const createMemonicWallet = ({
 }
 
 type localStorageParams = {
-  wallet: WalletType[]
+  wallets: WalletType[]
   mnemonics: string[]
   pathTypes: string[]
 }
 
 const saveWalletKeys = ({
-  wallet,
+  wallets,
   mnemonics,
   pathTypes
 }: localStorageParams) => {
-  localStorage.setItem('wallet', JSON.stringify(wallet))
+  localStorage.setItem('wallet', JSON.stringify(wallets))
   localStorage.setItem('mnemonics', JSON.stringify(mnemonics))
   localStorage.setItem('pathTypes', JSON.stringify(pathTypes))
 }
@@ -86,10 +86,10 @@ const fetchWallet = (): localStorageParams | null => {
   const localMemonics = localStorage.getItem('mnemonics')
   const localpathTypes = localStorage.getItem('pathTypes')
   if (localWallet && localMemonics && localpathTypes) {
-    const wallet = JSON.parse(localWallet)
+    const wallets = JSON.parse(localWallet)
     const mnemonics = JSON.parse(localMemonics)
     const pathTypes = JSON.parse(localpathTypes)
-    return { wallet, mnemonics, pathTypes }
+    return { wallets, mnemonics, pathTypes }
   } else {
     console.log('No previous saved Wallet found on Browser')
     return null
