@@ -6,7 +6,7 @@ import { clearWalletsKeys, createMemonicWallet, fetchWallet, generateMnemonicWor
 import { DisplayRecoveryPhrase } from './displayRecoveryPhrase'
 import { Button } from './ui/button'
 import { copyToClipboard } from '../lib/utils'
-import { EyeOff, Eye, Trash } from 'lucide-react'
+import { EyeOff, Eye, Trash, List, LayoutGrid } from 'lucide-react'
 import { toast } from 'sonner'
 import {
     AlertDialog,
@@ -28,6 +28,7 @@ export default function CreateWallet() {
     );
     const [visiblePrivateKeys, setVisiblePrivateKeys] = useState<boolean[]>([]);
     const [mnemonicInput, setMnemonicInput] = useState<string>("")
+    const [gridView, setGridView] = useState<boolean>(false)
 
 
     useEffect(() => {
@@ -133,6 +134,8 @@ export default function CreateWallet() {
                 <div className="flex flex-col md:flex-row justify-between w-full gap-4">
                     <h1 className=' righteous-regular scroll-m-20 md:text-3xl lg:text-4xl font-semibold'>{pathTypes[0] === "501" ? "Solana" : "Ethereum"} Wallet</h1>
                     <div className="flex gap-2">
+                        {wallets.length > 1 && (<Button size="sm" variant="ghost" onClick={() => setGridView(!gridView)}>{gridView ? <LayoutGrid size={20} /> : <List size={20} />}</Button>)}
+
                         <Button size="sm" onClick={addNewWallet} >Add Wallet</Button>
                         <AlertDialog>
                             <AlertDialogTrigger asChild>
@@ -154,7 +157,7 @@ export default function CreateWallet() {
                         </AlertDialog>
                     </div>
                 </div>
-                <div className="grid grid-col-1 col-span-1 gap-4">
+                <div className={`grid grid-col-1 col-span-1 gap-4 ${gridView ? "md:grid-cols-2 lg:grid-cols-3" : ""}  `}>
                     {wallets.map((wallet: WalletType, index: number) => (
                         <div className="flex flex-col border border-primary/50 rounded-md" key={index}>
                             <div className="flex justify-between px-8 py-6">
@@ -181,14 +184,14 @@ export default function CreateWallet() {
                             <div className='flex flex-col bg-secondary/50 px-8 py-6  cursor-pointer'>
                                 <div className="publickey flex flex-col w-full gap-2" onClick={() => copyToClipboard(wallet?.publicKey)}>
                                     <span className="text-xl font-bold tracking-tighter">Public Key</span>
-                                    <p className="text-primary/80 font-medium cursor-pointer hover:text-primary">
+                                    <p className="text-primary/80 font-medium cursor-pointer hover:text-primary truncate">
                                         {wallet.publicKey}</p>
 
                                 </div>
                                 <div className="publickey flex flex-col w-full gap-2" >
                                     <span className="text-xl font-bold tracking-tighter">Private Key</span>
                                     <div className="flex justify-between w-full items-center gap-2">
-                                        <p className="text-primary/80 font-medium cursor-pointer hover:text-primary" onClick={() => copyToClipboard(wallet?.privateKey)}>
+                                        <p className="text-primary/80 font-medium cursor-pointer hover:text-primary truncate" onClick={() => copyToClipboard(wallet?.privateKey)}>
                                             {visiblePrivateKeys[index]
                                                 ? wallet.privateKey
                                                 : "*".repeat(wallet.privateKey.length)}</p>
