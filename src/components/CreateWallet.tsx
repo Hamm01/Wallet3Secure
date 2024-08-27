@@ -8,7 +8,17 @@ import { Button } from './ui/button'
 import { copyToClipboard } from '../lib/utils'
 import { EyeOff, Eye, Trash } from 'lucide-react'
 import { toast } from 'sonner'
-
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 
 export default function CreateWallet() {
     const [wallets, setWallets] = useState<WalletType[]>([])
@@ -23,11 +33,11 @@ export default function CreateWallet() {
     useEffect(() => {
         const storedkeys = fetchWallet()
         if (storedkeys) {
-            const { wallet, mnemonics, pathTypes } = storedkeys
+            const { wallets, mnemonics, pathTypes } = storedkeys
             setPathtypes(pathTypes)
             setMnemonicWords(mnemonics)
-            setWallets(wallet)
-            setVisiblePrivateKeys(wallet.map(() => false))
+            setWallets(wallets)
+            setVisiblePrivateKeys(wallets.map(() => false))
             toast.success("Wallet Fetched properly")
         }
 
@@ -57,10 +67,26 @@ export default function CreateWallet() {
                 const updatedWallets = [...wallets, Wallet]
                 setWallets(updatedWallets)
                 setVisiblePrivateKeys([...visiblePrivateKeys, false])
-                saveWalletKeys({ wallet: updatedWallets, mnemonics: mnemonicArray, pathTypes })
+                saveWalletKeys({ wallets: updatedWallets, mnemonics: mnemonicArray, pathTypes })
                 toast.success("Wallet generated successfully")
             }
         }
+    }
+    const addNewWallet = () => {
+        if (!mnemonicWords && pathTypes[0]) {
+            toast.error("Generate the mnemonics first")
+            return
+        }
+        const mnemonic = mnemonicWords.join(" ")
+        const newWallet = createMemonicWallet({ mnemonic, pathTypes: pathTypes[0], index: wallets.length })
+        if (newWallet) {
+            const updatedWallets = [...wallets, newWallet]
+            setWallets(updatedWallets)
+            setVisiblePrivateKeys([...visiblePrivateKeys, false])
+            saveWalletKeys({ wallets: updatedWallets, mnemonics: mnemonicWords, pathTypes })
+            toast.success("Wallet Added")
+        }
+
     }
 
 
@@ -77,7 +103,25 @@ export default function CreateWallet() {
                 <div className="flex flex-col md:flex-row justify-between w-full gap-4">
                     <h1 className=' righteous-regular scroll-m-20 md:text-3xl lg:text-4xl font-semibold'>{pathTypes[0] === "501" ? "Solana" : "Ethereum"} Wallet</h1>
                     <div className="flex gap-2">
-                        <Button size="sm" >Add Wallet</Button>
+                        <Button size="sm" onClick={addNewWallet} >Add Wallet</Button>
+                        <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                                <Button variant="destructive" size="sm">Clear Wallets</Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle>Are you want to clear all wallets</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                        This action cannot be undone. This will permanently delete your
+                                        secret key and all the wallets listed on screen
+                                    </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                    <AlertDialogAction >Continue</AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
                         <Button variant="destructive" size="sm">Clear Wallets</Button>
                     </div>
                 </div>
