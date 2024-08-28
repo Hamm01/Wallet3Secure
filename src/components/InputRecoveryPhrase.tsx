@@ -7,6 +7,7 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from "@/components/ui/tooltip"
+import { motion as m } from 'framer-motion'
 
 type Props = {
     walletGenerate: () => void,
@@ -15,7 +16,14 @@ type Props = {
 };
 const InputRecoveryPhrase: React.FC<Props> = ({ walletGenerate, mnemonicInput, setMnemonicInput }) => {
     return (
-        <div className='flex flex-col gap-4 my-5'>
+        <m.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{
+                duration: 0.3,
+                ease: "easeInOut"
+            }}
+            className='flex flex-col gap-4 my-5'>
             <div className='flex flex-col gap-2'>
                 <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">Wallet Recovery Phrase</h1>
                 <p className="scroll-m-20 pb-2 pt-2 text-2xl font-semibold tracking-tight first:mt-0"> Copy the words at safe place</p>
@@ -35,7 +43,7 @@ const InputRecoveryPhrase: React.FC<Props> = ({ walletGenerate, mnemonicInput, s
 
                 <Button className='h-10 px-12' onClick={walletGenerate}>Generate Wallet</Button>
             </div>
-        </div>
+        </m.div>
     )
 }
 
