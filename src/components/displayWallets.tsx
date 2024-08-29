@@ -1,6 +1,7 @@
+import { useState } from 'react'
 import { Button } from './ui/button'
 import { copyToClipboard } from '../lib/utils'
-import { EyeOff, Eye, Trash, List, LayoutGrid } from 'lucide-react'
+import { EyeOff, Eye, Trash, List, LayoutGrid, ArrowUp, ArrowDown } from 'lucide-react'
 import { WalletType } from '../lib/types'
 import {
     AlertDialog,
@@ -14,12 +15,12 @@ import {
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 
+import { useTheme } from "@/components/theme-provider"
+
 interface DisplayWalletsProps {
     wallets: WalletType[];
     pathTypes: string[]
-    gridView: boolean;
     visiblePrivateKeys: boolean[]
-    setGridView: (value: boolean) => void;
     addNewWallet: () => void;
     clearWallets: () => void;
     deleteWallets: (index: number) => void;
@@ -29,8 +30,13 @@ interface DisplayWalletsProps {
 
 
 export const DisplayWallets: React.FC<{ props: DisplayWalletsProps }> = ({ props }) => {
-    const { wallets, pathTypes, gridView, setGridView, visiblePrivateKeys, addNewWallet, clearWallets, deleteWallets, toggleVisibility } = props
-
+    const { wallets, pathTypes, visiblePrivateKeys, addNewWallet, clearWallets, deleteWallets, toggleVisibility } = props
+    const [gridView, setGridView] = useState<boolean>(false)
+    const { theme, setTheme } = useTheme()
+    const isDarkMode =
+        theme === "dark" ||
+        (theme === "light" &&
+            window.matchMedia("(prefers-color-scheme: dark)").matches);
 
     return <div className='flex flex-col gap-8 '>
         <div className="flex flex-col md:flex-row justify-between w-full gap-4">
@@ -66,7 +72,7 @@ export const DisplayWallets: React.FC<{ props: DisplayWalletsProps }> = ({ props
                         <h2 className='righteous-regular scroll-m-20 lg:text-3xl font-semibold'>Wallet {index + 1}</h2>
                         <AlertDialog>
                             <AlertDialogTrigger asChild>
-                                <Button variant="ghost" size="sm"><Trash size={18} color="#ff0000" />  </Button>
+                                <Button variant="ghost" size="sm"><Trash size={18} className='text-destructive' />  </Button>
                             </AlertDialogTrigger>
                             <AlertDialogContent>
                                 <AlertDialogHeader>
@@ -81,14 +87,33 @@ export const DisplayWallets: React.FC<{ props: DisplayWalletsProps }> = ({ props
                                 </AlertDialogFooter>
                             </AlertDialogContent>
                         </AlertDialog>
-
                     </div>
-                    <div className='flex flex-col bg-secondary/50 px-8 py-6  cursor-pointer'>
+                    <div className='flex px-4 py-4 bg-accent justify-center rounded-t-3xl'>
+                        <div className='flex flex-col relative my-4'>
+                            <div className={`rounded-full px-10 py-10 ${!isDarkMode ? 'bg-gradient-to-r from-slate-900 to-slate-700' : 'bg-gradient-to-b from-slate-50 to-slate-400'}  cursor-pointer`}>
+                                <div className="flex px-10 py-10 justify-center items-center">
+                                    <p className='text-4xl text-secondary tracking-tighter absolute'> 0.00 <span className='text-lg'>ETH</span> </p>
+                                </div>
+                            </div>
+
+                            <div className="flex gap-4 my-2 justify-center">
+                                <div className="button-grp flex flex-col justify-center items-center">
+                                    <Button variant="outline" className='' ><ArrowUp size={18} /></Button>
+                                    <p>Send</p>
+                                </div>
+                                <div className="button-grp flex flex-col justify-center items-center">
+                                    <Button variant="outline"><ArrowDown size={18} /></Button>
+                                    <p>Receive</p>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className='flex flex-col bg-secondary/50 px-8 py-6  cursor-pointer rounded'>
                         <div className="publickey flex flex-col w-full gap-2" onClick={() => copyToClipboard(wallet?.publicKey)}>
                             <span className="text-xl font-bold tracking-tighter">Public Key</span>
                             <p className="text-primary/80 font-medium cursor-pointer hover:text-primary truncate">
                                 {wallet.publicKey}</p>
-
                         </div>
                         <div className="publickey flex flex-col w-full gap-2" >
                             <span className="text-xl font-bold tracking-tighter">Private Key</span>
@@ -105,8 +130,6 @@ export const DisplayWallets: React.FC<{ props: DisplayWalletsProps }> = ({ props
                                     )}
                                 </Button>
                             </div>
-
-
                         </div>
                     </div>
                 </div>
