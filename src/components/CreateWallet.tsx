@@ -14,7 +14,7 @@ export default function CreateWallet() {
     const [mnemonicWords, setMnemonicWords] = useState<string[]>(Array(12).fill(" "));
     const [visiblePrivateKeys, setVisiblePrivateKeys] = useState<boolean[]>([]);
     const [mnemonicInput, setMnemonicInput] = useState<string>("")
-    const [gridView, setGridView] = useState<boolean>(false)
+
 
     useEffect(() => {
         const storedkeys = fetchWallet()
@@ -116,7 +116,7 @@ export default function CreateWallet() {
             </div>)}
             {wallets.length > 0 && mnemonicWords && (<DisplayRecoveryPhrase mnemonicWords={mnemonicWords} />)
             }
-            {wallets.length > 0 && (<DisplayWallets props={{ wallets, pathTypes, gridView, setGridView, visiblePrivateKeys, addNewWallet, clearWallets, deleteWallets, toggleVisibility }} />)
+            {wallets.length > 0 && (<DisplayWallets props={{ wallets, pathTypes, visiblePrivateKeys, addNewWallet, clearWallets, deleteWallets, toggleVisibility }} />)
             }
 
         </div>
