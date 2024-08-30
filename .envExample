@@ -1,0 +1,2 @@
+VITE_ETH_ALCHEMY_URL=https://eth-mainnet.g.alchemy.com/v2/your_api_key
+VITE_SOL_ALCHEMY_URL=https://solana-mainnet.g.alchemy.com/v2/your_api_key
