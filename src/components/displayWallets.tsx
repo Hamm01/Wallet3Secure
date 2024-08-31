@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button } from './ui/button'
 import { copyToClipboard } from '../lib/utils'
 import { EyeOff, Eye, Trash, List, LayoutGrid, CircleArrowUp, CircleArrowDown, RefreshCcw } from 'lucide-react'
@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/tooltip"
 
 import { useTheme } from "@/components/theme-provider"
+import { fetchBalance } from "../lib/walletFunctions"
 
 interface DisplayWalletsProps {
     wallets: WalletType[];
@@ -32,21 +33,59 @@ interface DisplayWalletsProps {
     deleteWallets: (index: number) => void;
     toggleVisibility: (index: number) => void;
 }
+interface walletBalance {
+    pubkey: string,
+    balance: number
+}
 
 
 
 export const DisplayWallets: React.FC<{ props: DisplayWalletsProps }> = ({ props }) => {
     const { wallets, pathTypes, visiblePrivateKeys, addNewWallet, clearWallets, deleteWallets, toggleVisibility } = props
     const [gridView, setGridView] = useState<boolean>(false)
+    const [walletBalance, setWalletBalance] = useState<walletBalance[]>([])
+    const WalletType = pathTypes[0] === "501" ? "Solana" : "Ethereum"
+
+    useEffect(() => {
+
+        const walletpubkeys = wallets.map(wallet => { return { pubkey: wallet.publicKey, balance: 0 } })
+        setWalletBalance(walletpubkeys)
+
+    }, [])
+
     const { theme } = useTheme()
     const isDarkMode =
         theme === "dark" ||
         (theme === "light" &&
             window.matchMedia("(prefers-color-scheme: dark)").matches);
 
+    const fetchWalletBalance = async (pubkey: string) => {
+        if (!WalletType) {
+            console.error("Failed in getting the Wallet type")
+        }
+        const balance = await fetchBalance(pubkey, WalletType)
+
+        if (balance) {
+            const updatedWalletBalance = walletBalance.map(wallet => {
+                if (wallet.pubkey === pubkey) {
+                    wallet.balance = balance
+                }
+                return wallet
+
+            })
+            setWalletBalance(updatedWalletBalance)
+        }
+    }
+    function balanceOnScreen(address: string) {
+
+        const account = walletBalance.find(key => key.pubkey === address)
+        const amount = account ? Math.floor(account.balance * 1e6) / 1e6 : "0.00"
+        return amount
+
+    }
     return <div className='flex flex-col gap-8 '>
         <div className="flex flex-col md:flex-row justify-between w-full gap-4">
-            <h1 className=' righteous-regular scroll-m-20 md:text-3xl lg:text-4xl font-semibold'>{pathTypes[0] === "501" ? "Solana" : "Ethereum"} Wallet</h1>
+            <h1 className=' righteous-regular scroll-m-20 md:text-3xl lg:text-4xl font-semibold'>{WalletType} Wallet</h1>
             <div className="flex gap-2">
                 {wallets.length > 1 && (<Button size="sm" variant="ghost" onClick={() => setGridView(!gridView)}>{gridView ? <LayoutGrid size={20} /> : <List size={20} />}</Button>)}
 
@@ -80,7 +119,7 @@ export const DisplayWallets: React.FC<{ props: DisplayWalletsProps }> = ({ props
                             <TooltipProvider>
                                 <Tooltip>
                                     <TooltipTrigger asChild>
-                                        <Button variant="ghost" size="sm"><RefreshCcw size={18} /></Button>
+                                        <Button variant="ghost" size="sm" onClick={() => fetchWalletBalance(wallet.publicKey)}><RefreshCcw size={18} /></Button>
                                     </TooltipTrigger>
                                     <TooltipContent>
                                         <p>Refresh Balance</p>
@@ -90,7 +129,7 @@ export const DisplayWallets: React.FC<{ props: DisplayWalletsProps }> = ({ props
 
                             <AlertDialog>
                                 <AlertDialogTrigger asChild>
-                                    <Button variant="ghost" size="sm"><Trash size={18} className='text-destructive' />  </Button>
+                                    <Button variant="ghost" size="sm"><Trash size={18} className='text-destructive' /> </Button>
                                 </AlertDialogTrigger>
                                 <AlertDialogContent>
                                     <AlertDialogHeader>
@@ -112,7 +151,7 @@ export const DisplayWallets: React.FC<{ props: DisplayWalletsProps }> = ({ props
                         <div className='flex flex-col relative my-4'>
                             <div className={`rounded-full px-10 py-10 ${!isDarkMode ? 'bg-gradient-to-r from-slate-900 to-slate-700' : 'bg-gradient-to-b from-slate-50 to-slate-400'}  cursor-pointer`}>
                                 <div className="flex px-10 py-10 justify-center items-center">
-                                    <p className='text-4xl text-secondary tracking-tighter absolute'> 0.00 <span className='text-lg font-semibold tracking-normal'>{pathTypes[0] === "501" ? "SOL" : "ETH"} </span> </p>
+                                    <p className='iceland text-3xl text-secondary tracking-tighter absolute'> {balanceOnScreen(wallet.publicKey)} <span className='text-2xl font-semibold tracking-normal'>{pathTypes[0] === "501" ? "SOL" : "ETH"} </span> </p>
                                 </div>
                             </div>
 
