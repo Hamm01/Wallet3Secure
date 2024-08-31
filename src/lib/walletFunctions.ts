@@ -84,7 +84,33 @@ type localStorageParams = {
   pathTypes: string[]
 }
 
-const fetchBalance = async (address: string, type: string) => {}
+const fetchBalance = async (address: string, type: string) => {
+  try {
+    // success talk disorder must meat tornado aware prevent worry vacant idle birth
+    //  gather decorate jealous school miss fragile bamboo clean choose glare cage honey
+    if (type === 'Ethereum') {
+      const provider = new ethers.JsonRpcProvider(EthAlchemyUrl)
+      const weiBalance = await provider.getBalance(address)
+      const ethBalance = ethers.formatEther(weiBalance)
+      return parseFloat(ethBalance.split(' ')[0])
+    } else if (type === 'Solana') {
+      const connection = new Connection(SolAlchemyUrl)
+      const publicKey = new PublicKey(address)
+      const accountInfo = await connection.getAccountInfo(publicKey)
+      if (accountInfo) {
+        const balanceInlamports = accountInfo.lamports
+        const balanceInSols = balanceInlamports / 1_000_000_000
+        return balanceInSols
+      } else {
+        console.error('Account not Found for solana blockchain')
+      }
+    } else {
+      throw Error
+    }
+  } catch (error) {
+    console.error('Error in retreiving Balance')
+  }
+}
 
 const saveWalletKeys = ({
   wallets,
