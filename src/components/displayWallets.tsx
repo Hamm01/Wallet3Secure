@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
 import { Button } from './ui/button'
 import { copyToClipboard } from '../lib/utils'
-import { EyeOff, Eye, Trash, List, LayoutGrid, CircleArrowUp, CircleArrowDown, RefreshCcw } from 'lucide-react'
+import { EyeOff, Eye, Trash, List, LayoutGrid, CircleArrowUp, CircleArrowDown, RefreshCcw, CopyIcon } from 'lucide-react'
 import { WalletType } from '../lib/types'
+import { Input } from "@/components/ui/input"
 import {
     AlertDialog,
     AlertDialogAction,
@@ -15,6 +16,16 @@ import {
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import {
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog"
+import {
     Tooltip,
     TooltipContent,
     TooltipProvider,
@@ -23,6 +34,8 @@ import {
 
 import { useTheme } from "@/components/theme-provider"
 import { fetchBalance } from "../lib/walletFunctions"
+import { Label } from '@/components/ui/label'
+import { AddressGenerator } from './addressGenerator'
 
 interface DisplayWalletsProps {
     wallets: WalletType[];
@@ -167,12 +180,54 @@ export const DisplayWallets: React.FC<{ props: DisplayWalletsProps }> = ({ props
 
                             <div className="flex gap-2 mt-2 justify-center">
                                 <div className="button-grp flex flex-col justify-center items-center">
-                                    <Button variant="ghost"  ><CircleArrowUp size={24} /></Button>
-                                    <p className='text-md font-semibold'>Send</p>
+                                    <Dialog>
+                                        <DialogTrigger asChild>
+                                            <Button variant="ghost"  ><CircleArrowDown size={24} /></Button>
+                                        </DialogTrigger>
+                                        <DialogContent className="sm:max-w-md">
+                                            <DialogHeader>
+                                                <DialogTitle>Share Public Address</DialogTitle>
+                                                <DialogDescription>
+                                                    Anyone who has this Public Address can send you {WalletType}
+                                                </DialogDescription>
+                                            </DialogHeader>
+                                            <div className="flex flex-col items-center space-x-2">
+                                                <div className="flex items-center space-y-2">
+                                                    <AddressGenerator address={wallet?.publicKey} size={200} />
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <div className="grid flex-1 gap-2">
+                                                        <Label htmlFor="link" className="sr-only">
+                                                            Link
+                                                        </Label>
+                                                        <Input
+                                                            id="link"
+                                                            defaultValue={wallet?.publicKey}
+                                                            readOnly
+                                                        />
+                                                    </div>
+                                                    <Button type="submit" size="sm" className="px-3" onClick={() => copyToClipboard(wallet?.publicKey)}>
+                                                        <span className="sr-only">Copy</span>
+                                                        <CopyIcon className="h-4 w-4" />
+                                                    </Button>
+                                                </div>
+
+                                            </div>
+                                            <DialogFooter className="sm:justify-start lg:justify-end">
+                                                <DialogClose asChild>
+                                                    <Button type="button" variant="secondary">
+                                                        Close
+                                                    </Button>
+                                                </DialogClose>
+                                            </DialogFooter>
+                                        </DialogContent>
+                                    </Dialog>
+
+                                    <p className='text-md font-semibold'>Recieve</p>
                                 </div>
                                 <div className="button-grp flex flex-col justify-center items-center">
-                                    <Button variant="ghost"><CircleArrowDown size={24} /></Button>
-                                    <p className='text-md font-semibold'>Receive</p>
+                                    <Button variant="ghost"><CircleArrowUp size={24} /></Button>
+                                    <p className='text-md font-semibold'>Send</p>
 
                                 </div>
                             </div>
