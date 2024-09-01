@@ -48,10 +48,23 @@ export const DisplayWallets: React.FC<{ props: DisplayWalletsProps }> = ({ props
 
     useEffect(() => {
 
-        const walletpubkeys = wallets.map(wallet => { return { pubkey: wallet.publicKey, balance: 0 } })
-        setWalletBalance(walletpubkeys)
+        // Doing every address a zero balance every time a new address genrated or new wallet created
+        const addressWithZeroBalance = wallets.map(wallet => { return { pubkey: wallet.publicKey, balance: 0 } })
+        // Now we are filtering the data with addressWithZeroBalance with the addresses we already have in walletBalance
+        // we will take that balance for address from walletBalance , so that we dont thave to do everytime network request
+        // for our existing fetched address balances
+        const filteringAddressWithBalance = addressWithZeroBalance.map(wallet => {
+            if (walletBalance.find(key => wallet.pubkey === key.pubkey)) {
+                const foundaddress = walletBalance.filter(key => wallet.pubkey === key.pubkey)
+                return { pubkey: wallet.pubkey, balance: foundaddress[0].balance }
+            } else {
+                return wallet
+            }
 
-    }, [])
+        })
+        setWalletBalance(filteringAddressWithBalance)
+
+    }, [wallets])
 
     const { theme } = useTheme()
     const isDarkMode =
@@ -64,7 +77,6 @@ export const DisplayWallets: React.FC<{ props: DisplayWalletsProps }> = ({ props
             console.error("Failed in getting the Wallet type")
         }
         const balance = await fetchBalance(pubkey, WalletType)
-
         if (balance) {
             const updatedWalletBalance = walletBalance.map(wallet => {
                 if (wallet.pubkey === pubkey) {
@@ -77,11 +89,9 @@ export const DisplayWallets: React.FC<{ props: DisplayWalletsProps }> = ({ props
         }
     }
     function balanceOnScreen(address: string) {
-
         const account = walletBalance.find(key => key.pubkey === address)
         const amount = account ? Math.floor(account.balance * 1e6) / 1e6 : "0.00"
         return amount
-
     }
     return <div className='flex flex-col gap-8 '>
         <div className="flex flex-col md:flex-row justify-between w-full gap-4">

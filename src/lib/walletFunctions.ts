@@ -86,8 +86,6 @@ type localStorageParams = {
 
 const fetchBalance = async (address: string, type: string) => {
   try {
-    // success talk disorder must meat tornado aware prevent worry vacant idle birth
-    //  gather decorate jealous school miss fragile bamboo clean choose glare cage honey
     if (type === 'Ethereum') {
       const provider = new ethers.JsonRpcProvider(EthAlchemyUrl)
       const weiBalance = await provider.getBalance(address)
