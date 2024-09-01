@@ -109,6 +109,44 @@ const fetchBalance = async (address: string, type: string) => {
     console.error('Error in retreiving Balance')
   }
 }
+interface SENDPARAMS {
+  toAddress: string
+  fromPrivAddress: string
+  amount: string
+  type: string
+}
+const sendTransaction = async ({
+  toAddress,
+  fromPrivAddress,
+  amount,
+  type
+}: SENDPARAMS) => {
+  try {
+    if (type === 'ETH') {
+      const provider = new ethers.JsonRpcProvider(EthAlchemyUrl)
+      const privateKey = fromPrivAddress
+      const wallet = new ethers.Wallet(privateKey, provider)
+
+      const { gasPrice } = await provider.getFeeData()
+      if (!gasPrice) {
+        throw new Error('Unable to fetch gas price')
+      }
+
+      const tx = {
+        to: toAddress,
+        value: ethers.parseEther(amount),
+        gasPrice: gasPrice,
+        gasLimit: 21000
+      }
+      const TransactionRes = await wallet.sendTransaction(tx)
+      //waiting time as transaction submitted on eth blockchain
+      const Receipt = await TransactionRes.wait()
+      return { Receipt }
+    }
+  } catch (error) {
+    console.error('Error sending transaction:', error)
+  }
+}
 
 const saveWalletKeys = ({
   wallets,
@@ -150,6 +188,7 @@ export {
   generateMnemonicWords,
   createMemonicWallet,
   fetchBalance,
+  sendTransaction,
   saveWalletKeys,
   fetchWallet,
   clearWalletsKeys
