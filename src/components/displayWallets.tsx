@@ -36,6 +36,7 @@ import { useTheme } from "@/components/theme-provider"
 import { fetchBalance } from "../lib/walletFunctions"
 import { Label } from '@/components/ui/label'
 import { AddressGenerator } from './addressGenerator'
+import { SendComponent } from './sendComponent'
 
 interface DisplayWalletsProps {
     wallets: WalletType[];
@@ -191,8 +192,8 @@ export const DisplayWallets: React.FC<{ props: DisplayWalletsProps }> = ({ props
                                                     Anyone who has this Public Address can send you {WalletType}
                                                 </DialogDescription>
                                             </DialogHeader>
-                                            <div className="flex flex-col items-center space-x-2">
-                                                <div className="flex items-center space-y-2">
+                                            <div className="flex flex-col items-center space-x-2 gap-4">
+                                                <div className="flex items-center space-y-4">
                                                     <AddressGenerator address={wallet?.publicKey} size={200} />
                                                 </div>
                                                 <div className="flex items-center gap-2">
@@ -200,11 +201,14 @@ export const DisplayWallets: React.FC<{ props: DisplayWalletsProps }> = ({ props
                                                         <Label htmlFor="link" className="sr-only">
                                                             Link
                                                         </Label>
-                                                        <Input
+                                                        <p className='text-primary/80 text-sm font-medium cursor-pointer hover:text-primary border p-2 rounded-md truncate ' onClick={() => copyToClipboard(wallet?.publicKey)}>
+                                                            {wallet?.publicKey}
+                                                        </p>
+                                                        {/* <Input
                                                             id="link"
                                                             defaultValue={wallet?.publicKey}
                                                             readOnly
-                                                        />
+                                                        /> */}
                                                     </div>
                                                     <Button type="submit" size="sm" className="px-3" onClick={() => copyToClipboard(wallet?.publicKey)}>
                                                         <span className="sr-only">Copy</span>
@@ -226,7 +230,7 @@ export const DisplayWallets: React.FC<{ props: DisplayWalletsProps }> = ({ props
                                     <p className='text-md font-semibold'>Recieve</p>
                                 </div>
                                 <div className="button-grp flex flex-col justify-center items-center">
-                                    <Button variant="ghost"><CircleArrowUp size={24} /></Button>
+                                    <SendComponent />
                                     <p className='text-md font-semibold'>Send</p>
 
                                 </div>
