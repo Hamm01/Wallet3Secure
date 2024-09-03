@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Button } from './ui/button'
 import { copyToClipboard } from '../lib/utils'
-import { EyeOff, Eye, Trash, List, LayoutGrid, CircleArrowUp, CircleArrowDown, RefreshCcw, CopyIcon } from 'lucide-react'
+import { EyeOff, Eye, Trash, List, LayoutGrid, CircleArrowDown, RefreshCcw, CopyIcon } from 'lucide-react'
 import { WalletType } from '../lib/types'
-import { Input } from "@/components/ui/input"
 import {
     AlertDialog,
     AlertDialogAction,
@@ -59,10 +58,14 @@ export const DisplayWallets: React.FC<{ props: DisplayWalletsProps }> = ({ props
     const [gridView, setGridView] = useState<boolean>(false)
     const [walletBalance, setWalletBalance] = useState<walletBalance[]>([])
     const WalletType = pathTypes[0] === "501" ? "Solana" : "Ethereum"
-
+    const { theme } = useTheme()
+    const isDarkMode =
+        theme === "dark" ||
+        (theme === "light" &&
+            window.matchMedia("(prefers-color-scheme: dark)").matches);
     useEffect(() => {
 
-        // Doing every address a zero balance every time a new address genrated or new wallet created
+        // Doing every address a zero balance every time a new address generated or new wallet created
         const addressWithZeroBalance = wallets.map(wallet => { return { pubkey: wallet.publicKey, balance: 0 } })
         // Now we are filtering the data with addressWithZeroBalance with the addresses we already have in walletBalance
         // we will take that balance for address from walletBalance , so that we dont thave to do everytime network request
@@ -80,11 +83,8 @@ export const DisplayWallets: React.FC<{ props: DisplayWalletsProps }> = ({ props
 
     }, [wallets])
 
-    const { theme } = useTheme()
-    const isDarkMode =
-        theme === "dark" ||
-        (theme === "light" &&
-            window.matchMedia("(prefers-color-scheme: dark)").matches);
+
+
 
     const fetchWalletBalance = async (pubkey: string) => {
         if (!WalletType) {
@@ -102,11 +102,15 @@ export const DisplayWallets: React.FC<{ props: DisplayWalletsProps }> = ({ props
             setWalletBalance(updatedWalletBalance)
         }
     }
+
+
     function balanceOnScreen(address: string) {
         const account = walletBalance.find(key => key.pubkey === address)
         const amount = account ? Math.floor(account.balance * 1e6) / 1e6 : "0.00"
         return amount
     }
+
+
     return <div className='flex flex-col gap-8 '>
         <div className="flex flex-col md:flex-row justify-between w-full gap-4">
             <h1 className=' righteous-regular scroll-m-20 md:text-3xl lg:text-4xl font-semibold'>{WalletType} Wallet</h1>
@@ -230,7 +234,7 @@ export const DisplayWallets: React.FC<{ props: DisplayWalletsProps }> = ({ props
                                     <p className='text-md font-semibold'>Recieve</p>
                                 </div>
                                 <div className="button-grp flex flex-col justify-center items-center">
-                                    <SendComponent />
+                                    <SendComponent privKey={wallet?.privateKey} balance={balanceOnScreen(wallet.publicKey)} type={WalletType} isDarkMode={isDarkMode} />
                                     <p className='text-md font-semibold'>Send</p>
 
                                 </div>
