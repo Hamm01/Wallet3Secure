@@ -109,7 +109,7 @@ const fetchBalance = async (address: string, type: string) => {
     console.error('Error in retreiving Balance')
   }
 }
-interface SENDPARAMS {
+interface SENDPARAMSTYPE {
   toAddress: string
   fromPrivAddress: string
   amount: string
@@ -120,9 +120,9 @@ const sendTransaction = async ({
   fromPrivAddress,
   amount,
   type
-}: SENDPARAMS) => {
+}: SENDPARAMSTYPE) => {
   try {
-    if (type === 'ETH') {
+    if (type === 'Ethereum') {
       const provider = new ethers.JsonRpcProvider(EthAlchemyUrl)
       const privateKey = fromPrivAddress
       const wallet = new ethers.Wallet(privateKey, provider)
@@ -193,3 +193,4 @@ export {
   fetchWallet,
   clearWalletsKeys
 }
+export type { SENDPARAMSTYPE }
