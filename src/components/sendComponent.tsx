@@ -52,18 +52,28 @@ export const SendComponent: React.FC<SENDTRANSPARAMS> = ({ privKey, balance, typ
 
     async function doTransact({ toAddress, amount }: any) {
         setLoading(true)
-        const response = await sendTransaction({ toAddress, fromPrivAddress: privKey, amount, type })
-        if (response?.Receipt?.status) {
+        const response = await sendTransaction({ toAddress, senderPrivAddress: privKey, amount, type })
+
+        if (response) {
+            if (typeof (response) != "string" && response?.status) {
+                setblockHash(response?.hash)
+            } else if (typeof (response) === "string") {
+                setblockHash(response)
+            } else {
+                console.error("Some Error in response field")
+                return
+            }
             setLoading(false)
-            setblockHash(response?.Receipt?.hash)
             setIsOpen(true);
             setToAddress("")
             setAmount("")
             toast.success("Transaction Succesful!!")
         } else {
             setLoading(false)
+            alert("Error in sending the transaction")
             throw error
         }
+
     }
     return (
         <div> <Drawer>
@@ -110,7 +120,8 @@ export const SendComponent: React.FC<SENDTRANSPARAMS> = ({ privKey, balance, typ
                                                     Transaction Successful with hash:{' '}
                                                     <span className="text-sm" style={{ wordBreak: 'break-all' }}>{blockHash}</span>
                                                 </p>
-                                                <a className={`border p-2 text-center text-md font-semibold ${isDarkMode ? 'text-white hover:text-primary/50' : 'text-primary hover:text-primary/50'}`} target='_blank' href={`https://etherscan.io/tx/${blockHash}`}>Show on Explorer</a></div>
+                                                {type === "Ethereum" ? (<> <a className={`border p-2 text-center text-md font-semibold ${isDarkMode ? 'text-white hover:text-primary/50' : 'text-primary hover:text-primary/50'}`} target='_blank' href={`https://etherscan.io/tx/${blockHash}`}>Show on Explorer</a></>) : (<> <a className={`border p-2 text-center text-md font-semibold ${isDarkMode ? 'text-white hover:text-primary/50' : 'text-primary hover:text-primary/50'}`} target='_blank' href={`https://explorer.solana.com/tx/${blockHash}`}>Show on Explorer</a></>)}
+                                            </div>
                                         ) : (
                                             <p>Your transaction has been processed successfully.</p>
                                         )}
