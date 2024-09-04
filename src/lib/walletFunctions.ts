@@ -5,7 +5,14 @@ import bs58 from 'bs58'
 import { ethers } from 'ethers'
 import { HDKey } from 'ethereum-cryptography/hdkey'
 import { WalletType, WalletCreateParams } from './types'
-import { Keypair, Connection, PublicKey } from '@solana/web3.js'
+import {
+  Keypair,
+  Connection,
+  PublicKey,
+  SystemProgram,
+  sendAndConfirmTransaction,
+  Transaction
+} from '@solana/web3.js'
 const EthAlchemyUrl = import.meta.env.VITE_ETH_ALCHEMY_URL // This variable is saved in .env file
 const SolAlchemyUrl = import.meta.env.VITE_SOL_ALCHEMY_URL // This variable is saved in .env file
 
@@ -92,7 +99,7 @@ const fetchBalance = async (address: string, type: string) => {
       const ethBalance = ethers.formatEther(weiBalance)
       return parseFloat(ethBalance.split(' ')[0])
     } else if (type === 'Solana') {
-      const connection = new Connection(SolAlchemyUrl)
+      const connection = new Connection('https://api.devnet.solana.com')
       const publicKey = new PublicKey(address)
       const accountInfo = await connection.getAccountInfo(publicKey)
       if (accountInfo) {
@@ -111,20 +118,20 @@ const fetchBalance = async (address: string, type: string) => {
 }
 interface SENDPARAMSTYPE {
   toAddress: string
-  fromPrivAddress: string
+  senderPrivAddress: string
   amount: string
   type: string
 }
 const sendTransaction = async ({
   toAddress,
-  fromPrivAddress,
+  senderPrivAddress,
   amount,
   type
 }: SENDPARAMSTYPE) => {
   try {
     if (type === 'Ethereum') {
       const provider = new ethers.JsonRpcProvider(EthAlchemyUrl)
-      const privateKey = fromPrivAddress
+      const privateKey = senderPrivAddress
       const wallet = new ethers.Wallet(privateKey, provider)
 
       const { gasPrice } = await provider.getFeeData()
@@ -140,8 +147,39 @@ const sendTransaction = async ({
       }
       const TransactionRes = await wallet.sendTransaction(tx)
       //waiting time as transaction submitted on eth blockchain
-      const Receipt = await TransactionRes.wait()
-      return { Receipt }
+      const Receipt: ethers.TransactionReceipt | null =
+        await TransactionRes.wait()
+      return Receipt
+    } else if (type === 'Solana') {
+      const connection = new Connection(SolAlchemyUrl)
+      const decodedPrivateKey = bs58.decode(senderPrivAddress)
+      const senderKeypair = Keypair.fromSecretKey(decodedPrivateKey)
+      const recipientPubKey = new PublicKey(toAddress)
+      const lamportsSol = Number(amount) * 1e9 // Amount of solana  we are sending
+
+      //transaction instruction for sending the sol
+      const transaction = new Transaction().add(
+        SystemProgram.transfer({
+          fromPubkey: senderKeypair.publicKey,
+          toPubkey: recipientPubKey,
+          lamports: lamportsSol
+        })
+      )
+      // setting the recent blockhash for the transaction we are sending
+      transaction.recentBlockhash = (
+        await connection.getLatestBlockhash()
+      ).blockhash
+      transaction.feePayer = senderKeypair.publicKey
+      //Signing the transaction
+      const signedTransaction = await sendAndConfirmTransaction(
+        connection,
+        transaction,
+        [senderKeypair]
+      )
+      return signedTransaction
+    } else {
+      console.error('Wrong Type introduced rather than ethererum and solana')
+      return null
     }
   } catch (error) {
     console.error('Error sending transaction:', error)
