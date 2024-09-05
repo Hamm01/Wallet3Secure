@@ -13,8 +13,8 @@ import {
   sendAndConfirmTransaction,
   Transaction
 } from '@solana/web3.js'
-const EthAlchemyUrl = import.meta.env.VITE_ETH_ALCHEMY_URL // This variable is saved in .env file
-const SolAlchemyUrl = import.meta.env.VITE_SOL_ALCHEMY_URL // This variable is saved in .env file
+import {EthAlchemyUrl ,SolAlchemyUrl} from '@/components/mainnetButton'
+
 
 const generateMnemonicWords = async (input: string) => {
   let mnemonicWords = input.trim()
