@@ -1,6 +1,9 @@
 
 import { ModeToggle } from '@/components/mode-toggle'
-import { ShieldPlus } from 'lucide-react';;
+import { ShieldPlus } from 'lucide-react';
+import { MainnetButton } from './mainnetButton';
+
+
 
 export default function Navbar() {
     return (
@@ -11,7 +14,10 @@ export default function Navbar() {
                 </h3>
                 <ShieldPlus size={24} />
             </div>
-            <ModeToggle />
+            <div className="flex justify-center items-center gap-4">
+                <ModeToggle />
+                <MainnetButton />
+            </div>
         </nav>
     )
 }
